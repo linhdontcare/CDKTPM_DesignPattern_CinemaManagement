@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/main :: head('Sơ đồ Ghế')}"></head>
+<body>
+<nav th:replace="~{layout/main :: navbar}"></nav>
+<div th:replace="~{layout/main :: alerts}"></div>
+
+<div class="container my-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/showtimes}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h2 class="fw-bold mb-0">Sơ đồ Ghế Ngồi</h2>
+            </div>
+            <p class="text-muted mt-1 mb-0">
+                Phim: <strong class="text-dark" th:text="${showtime.movie.title}">Movie</strong> &bull;
+                Phòng: <span th:text="${showtime.roomName}">Hall 1</span> &bull;
+                Giờ: <span th:text="${#temporals.format(showtime.startTime, 'dd/MM/yyyy HH:mm')}">Time</span> &bull;
+                Giá vé: <span class="fw-bold text-success" th:text="${#numbers.formatDecimal(showtime.basePrice, 0, 'POINT', 0, 'POINT')} + ' đ'">Price</span>
+            </p>
+        </div>
+        <div>
+            <span class="badge bg-secondary px-3 py-2 fs-6">Tổng cộng: 30 Ghế</span>
+        </div>
+    </div>
+
+    <!-- Seat Status Legend -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body py-2">
+            <div class="d-flex justify-content-center flex-wrap gap-4 small fw-semibold">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="seat-box seat-available" style="width: 24px; height: 24px;"></div>
+                    <span>AVAILABLE (Ghế Trống)</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="seat-box seat-held" style="width: 24px; height: 24px;"></div>
+                    <span>HELD (Đang Giữ Chỗ)</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="seat-box seat-booked" style="width: 24px; height: 24px;"></div>
+                    <span>BOOKED (Đã Bán)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cinema Hall Visualization -->
+    <div class="card shadow-sm border-0 rounded-3 p-4 bg-white">
+        <!-- Screen indicator -->
+        <div class="screen-indicator">
+            <span class="screen-text">Màn Hình Chiếu / Screen</span>
+        </div>
+
+        <!-- Seats Matrix -->
+        <div class="seat-grid my-3">
+            <!-- Row A -->
+            <div class="seat-row">
+                <div class="seat-row-label">A</div>
+                <th:block th:each="s : ${seats}" th:if="${s.seatRow == 'A'}">
+                    <div class="seat-box"
+                         th:classappend="${s.status.name() == 'AVAILABLE'} ? 'seat-available' : (${s.status.name() == 'HELD'} ? 'seat-held' : 'seat-booked')"
+                         th:title="'Ghế ' + ${s.seatNumber} + ' - ' + ${s.status}">
+                        <span th:text="${s.seatNumber}">A1</span>
+                    </div>
+                </th:block>
+            </div>
+
+            <!-- Row B -->
+            <div class="seat-row">
+                <div class="seat-row-label">B</div>
+                <th:block th:each="s : ${seats}" th:if="${s.seatRow == 'B'}">
+                    <div class="seat-box"
+                         th:classappend="${s.status.name() == 'AVAILABLE'} ? 'seat-available' : (${s.status.name() == 'HELD'} ? 'seat-held' : 'seat-booked')"
+                         th:title="'Ghế ' + ${s.seatNumber} + ' - ' + ${s.status}">
+                        <span th:text="${s.seatNumber}">B1</span>
+                    </div>
+                </th:block>
+            </div>
+
+            <!-- Row C -->
+            <div class="seat-row">
+                <div class="seat-row-label">C</div>
+                <th:block th:each="s : ${seats}" th:if="${s.seatRow == 'C'}">
+                    <div class="seat-box"
+                         th:classappend="${s.status.name() == 'AVAILABLE'} ? 'seat-available' : (${s.status.name() == 'HELD'} ? 'seat-held' : 'seat-booked')"
+                         th:title="'Ghế ' + ${s.seatNumber} + ' - ' + ${s.status}">
+                        <span th:text="${s.seatNumber}">C1</span>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <div class="text-center mt-4 text-muted small">
+            <em>(Tại Phase tiếp theo: Khách hàng sẽ click vào ghế trống để chuyển trạng thái sang HELD và tiến hành tạo Booking & Thanh toán)</em>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{layout/main :: footer}"></footer>
+<div th:replace="~{layout/main :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/main :: head(${isEdit} ? 'Chỉnh sửa Suất Chiếu' : 'Tạo Suất Chiếu Mới')}"></head>
+<body>
+<nav th:replace="~{layout/main :: navbar}"></nav>
+<div th:replace="~{layout/main :: alerts}"></div>
+
+<div class="container my-4" style="max-width: 680px;">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" th:text="${isEdit} ? 'Chỉnh sửa Suất Chiếu' : 'Tạo Suất Chiếu Mới'">Tạo Suất Chiếu Mới</h2>
+            <p class="text-muted mb-0">Hệ thống sẽ tự động khởi tạo 30 ghế ngồi (A1-A10, B1-B10, C1-C10) cho suất chiếu mới</p>
+        </div>
+        <a th:href="@{/showtimes}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+            <form th:action="${isEdit} ? @{/showtimes/edit/{id}(id=${showtimeDto.id})} : @{/showtimes/new}"
+                  th:object="${showtimeDto}" method="post">
+
+                <!-- Movie Selection -->
+                <div class="mb-3">
+                    <label for="movieId" class="form-label fw-semibold">Chọn Phim <span class="text-danger">*</span></label>
+                    <select id="movieId" th:field="*{movieId}" class="form-select"
+                            th:classappend="${#fields.hasErrors('movieId')} ? 'is-invalid' : ''">
+                        <option value="">-- Chọn một bộ phim --</option>
+                        <option th:each="m : ${movies}" th:value="${m.id}" th:text="${m.title} + ' (' + ${m.duration} + ' phút)'"></option>
+                    </select>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('movieId')}" th:errors="*{movieId}"></div>
+                </div>
+
+                <!-- Room Name -->
+                <div class="mb-3">
+                    <label for="roomName" class="form-label fw-semibold">Phòng Chiếu</label>
+                    <input type="text" id="roomName" th:field="*{roomName}" class="form-control"
+                           placeholder="Ví dụ: Phòng Chiếu 01 (IMAX)">
+                </div>
+
+                <!-- Start Time -->
+                <div class="mb-3">
+                    <label for="startTime" class="form-label fw-semibold">Ngày & Giờ Chiếu <span class="text-danger">*</span></label>
+                    <input type="datetime-local" id="startTime" th:field="*{startTime}" class="form-control"
+                           th:classappend="${#fields.hasErrors('startTime')} ? 'is-invalid' : ''">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
+                </div>
+
+                <!-- Base Price -->
+                <div class="mb-4">
+                    <label for="basePrice" class="form-label fw-semibold">Giá Vé Cơ Bản (VNĐ) <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="number" step="1000" id="basePrice" th:field="*{basePrice}" class="form-control"
+                               th:classappend="${#fields.hasErrors('basePrice')} ? 'is-invalid' : ''"
+                               placeholder="Ví dụ: 85000">
+                        <span class="input-group-text">VNĐ</span>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('basePrice')}" th:errors="*{basePrice}"></div>
+                    </div>
+                    <div class="form-text">Giá vé cơ sở trước khi áp dụng khuyến mãi hoặc phụ thu của các phương thức thanh toán.</div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a th:href="@{/showtimes}" class="btn btn-light px-4">Hủy</a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-check2-circle me-1"></i>
+                        <span th:text="${isEdit} ? 'Lưu thay đổi' : 'Tạo suất chiếu'">Tạo suất chiếu</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{layout/main :: footer}"></footer>
+<div th:replace="~{layout/main :: scripts}"></div>
+</body>
+</html>

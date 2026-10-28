@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/main :: head(${isEdit} ? 'Chỉnh sửa Phim' : 'Thêm Phim Mới')}"></head>
+<body>
+<nav th:replace="~{layout/main :: navbar}"></nav>
+<div th:replace="~{layout/main :: alerts}"></div>
+
+<div class="container my-4" style="max-width: 720px;">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" th:text="${isEdit} ? 'Chỉnh sửa Thông tin Phim' : 'Thêm Phim Mới'">Thêm Phim Mới</h2>
+            <p class="text-muted mb-0">Điền thông tin chi tiết về bộ phim bên dưới</p>
+        </div>
+        <a th:href="@{/movies}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+            <form th:action="${isEdit} ? @{/movies/edit/{id}(id=${movieDto.id})} : @{/movies/new}"
+                  th:object="${movieDto}" method="post">
+
+                <div class="mb-3">
+                    <label for="title" class="form-label fw-semibold">Tên Phim <span class="text-danger">*</span></label>
+                    <input type="text" id="title" th:field="*{title}" class="form-control"
+                           th:classappend="${#fields.hasErrors('title')} ? 'is-invalid' : ''"
+                           placeholder="Ví dụ: Avengers: Endgame">
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="duration" class="form-label fw-semibold">Thời lượng (phút) <span class="text-danger">*</span></label>
+                        <input type="number" id="duration" th:field="*{duration}" class="form-control"
+                               th:classappend="${#fields.hasErrors('duration')} ? 'is-invalid' : ''"
+                               placeholder="Ví dụ: 120" min="1">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="genre" class="form-label fw-semibold">Thể loại <span class="text-danger">*</span></label>
+                        <input type="text" id="genre" th:field="*{genre}" class="form-control"
+                               th:classappend="${#fields.hasErrors('genre')} ? 'is-invalid' : ''"
+                               placeholder="Ví dụ: Hành Động, Khoa Học Viễn Tưởng">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('genre')}" th:errors="*{genre}"></div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="posterUrl" class="form-label fw-semibold">URL Poster Phim</label>
+                    <input type="text" id="posterUrl" th:field="*{posterUrl}" class="form-control"
+                           placeholder="https://images.unsplash.com/...">
+                    <div class="form-text">Dán đường dẫn ảnh poster (tùy chọn) để giao diện hiển thị trực quan hơn.</div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label fw-semibold">Mô tả nội dung phim</label>
+                    <textarea id="description" th:field="*{description}" class="form-control" rows="4"
+                              placeholder="Tóm tắt ngắn gọn nội dung phim..."></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a th:href="@{/movies}" class="btn btn-light px-4">Hủy</a>
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-check2-circle me-1"></i>
+                        <span th:text="${isEdit} ? 'Lưu thay đổi' : 'Thêm phim'">Thêm phim</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{layout/main :: footer}"></footer>
+<div th:replace="~{layout/main :: scripts}"></div>
+</body>
+</html>

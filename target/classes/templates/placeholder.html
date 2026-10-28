@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/main :: head(${title})}"></head>
+<body>
+<nav th:replace="~{layout/main :: navbar}"></nav>
+<div th:replace="~{layout/main :: alerts}"></div>
+
+<div class="container my-5 text-center" style="max-width: 760px;">
+    <div class="card shadow border-0 rounded-4 p-5 bg-white">
+        <div class="mb-4">
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-6 mb-3">
+                <i class="bi bi-tools me-1"></i> Dự kiến ở Phase 2
+            </span>
+            <h2 class="fw-bold" th:text="${title}">Quản lý</h2>
+            <h5 class="text-danger fw-semibold mt-2" th:text="'Áp dụng ' + ${patternName}">Design Patterns</h5>
+        </div>
+
+        <p class="lead text-secondary fs-6 mb-4" th:text="${description}">
+            Mô tả module...
+        </p>
+
+        <div class="p-3 bg-light rounded-3 text-start small mb-4">
+            <div class="fw-bold text-dark mb-2"><i class="bi bi-info-circle me-1"></i>Trạng thái hiện tại (Phase 1):</div>
+            <ul class="mb-0 text-muted ps-3">
+                <li>Đã hoàn thiện xong toàn bộ CRUD Phim (Movie) và Suất chiếu (Showtime).</li>
+                <li>Đã tạo đầy đủ các Entity nền tảng: <code>Movie</code>, <code>Showtime</code>, <code>Seat</code> (AVAILABLE, HELD, BOOKED), <code>Booking</code>, <code>BookingStatus</code>.</li>
+                <li>Khi bạn xác nhận nghiệm thu Phase 1, hệ thống sẽ tiến hành cài đặt Strategy, State, Observer và Adapter Pattern.</li>
+            </ul>
+        </div>
+
+        <div>
+            <a th:href="@{/dashboard}" class="btn btn-dark px-4 me-2">
+                <i class="bi bi-arrow-left me-1"></i> Về Dashboard
+            </a>
+            <a th:href="@{/movies}" class="btn btn-outline-danger px-4">
+                <i class="bi bi-film me-1"></i> Xem danh sách Phim
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{layout/main :: footer}"></footer>
+<div th:replace="~{layout/main :: scripts}"></div>
+</body>
+</html>

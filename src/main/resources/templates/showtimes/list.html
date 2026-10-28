@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/main :: head('Danh sách Suất Chiếu')}"></head>
+<body>
+<nav th:replace="~{layout/main :: navbar}"></nav>
+<div th:replace="~{layout/main :: alerts}"></div>
+
+<div class="container my-4">
+    <!-- Header & Action Bar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-clock-history text-primary me-2"></i>Quản lý Suất Chiếu</h2>
+            <p class="text-muted mb-0">Quản lý lịch chiếu phim, giá vé cơ bản và sơ đồ 30 ghế ngồi</p>
+        </div>
+        <div>
+            <a th:href="@{/showtimes/new}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Tạo Suất Chiếu Mới
+            </a>
+        </div>
+    </div>
+
+    <!-- Table of Showtimes -->
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th>Phim</th>
+                        <th>Phòng chiếu</th>
+                        <th>Ngày & Giờ chiếu</th>
+                        <th>Giá vé cơ bản</th>
+                        <th>Sơ đồ ghế (30 ghế)</th>
+                        <th class="text-end" style="width: 140px;">Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="st : ${showtimes}">
+                        <td class="text-muted" th:text="${st.id}">1</td>
+                        <td>
+                            <div class="fw-bold text-dark" th:text="${st.movie.title}">Movie Title</div>
+                            <span class="badge bg-light text-dark border small">
+                                <i class="bi bi-clock me-1"></i><span th:text="${st.movie.duration} + ' phút'"></span>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary-subtle text-secondary" th:text="${st.roomName}">Hall 1</span>
+                        </td>
+                        <td>
+                            <div class="fw-semibold text-primary">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                <span th:text="${#temporals.format(st.startTime, 'dd/MM/yyyy HH:mm')}">2026-10-28 19:30</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="fw-bold text-success" th:text="${#numbers.formatDecimal(st.basePrice, 0, 'POINT', 0, 'POINT')} + ' đ'">85.000 đ</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/showtimes/{id}/seats(id=${st.id})}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-grid-3x3-gap me-1"></i> Sơ đồ Ghế (A1-C10)
+                            </a>
+                        </td>
+                        <td class="text-end">
+                            <a th:href="@{/showtimes/edit/{id}(id=${st.id})}" class="btn btn-sm btn-light text-secondary" title="Sửa">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form th:action="@{/showtimes/delete/{id}(id=${st.id})}" method="post"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa suất chiếu này? Các ghế ngồi liên quan sẽ bị xóa.');" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-light text-danger" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(showtimes)}">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-calendar-x fs-1 mb-2 d-block"></i>
+                            Chưa có suất chiếu nào. Hãy tạo suất chiếu đầu tiên!
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{layout/main :: footer}"></footer>
+<div th:replace="~{layout/main :: scripts}"></div>
+</body>
+</html>

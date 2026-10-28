@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/main :: head(${movie.title})}"></head>
+<body>
+<nav th:replace="~{layout/main :: navbar}"></nav>
+<div th:replace="~{layout/main :: alerts}"></div>
+
+<div class="container my-4">
+    <div class="mb-3">
+        <a th:href="@{/movies}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách phim
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+        <div class="card-body p-4">
+            <div class="row g-4 align-items-center">
+                <div class="col-md-4 text-center">
+                    <img th:if="${movie.posterUrl != null && !movie.posterUrl.isBlank()}"
+                         th:src="${movie.posterUrl}" class="img-fluid rounded-3 shadow" style="max-height: 380px; object-fit: cover;" alt="Poster">
+                    <div th:unless="${movie.posterUrl != null && !movie.posterUrl.isBlank()}"
+                         class="movie-poster-placeholder rounded-3" style="height: 320px;">
+                        <i class="bi bi-film"></i>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="d-flex gap-2 mb-2">
+                        <span class="badge bg-danger" th:text="${movie.genre}">Genre</span>
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-clock me-1"></i><span th:text="${movie.duration} + ' phút'"></span>
+                        </span>
+                    </div>
+
+                    <h2 class="fw-bold mb-3" th:text="${movie.title}">Movie Title</h2>
+
+                    <div class="mb-4">
+                        <h6 class="text-uppercase text-muted fw-bold small">Mô tả nội dung</h6>
+                        <p class="lead fs-6 text-secondary" th:text="${movie.description}">Description text...</p>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <a th:href="@{/showtimes/new(movieId=${movie.id})}" class="btn btn-success">
+                            <i class="bi bi-plus-circle me-1"></i> Tạo Suất Chiếu Cho Phim Này
+                        </a>
+                        <a th:href="@{/movies/edit/{id}(id=${movie.id})}" class="btn btn-outline-secondary">
+                            <i class="bi bi-pencil me-1"></i> Chỉnh sửa
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Showtimes for this movie -->
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-calendar3 me-2 text-danger"></i>Các Suất Chiếu Của Phim Này</h5>
+            <a th:href="@{/showtimes/new(movieId=${movie.id})}" class="btn btn-sm btn-outline-danger">+ Thêm suất</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Phòng chiếu</th>
+                        <th>Ngày & Giờ chiếu</th>
+                        <th>Giá vé cơ bản</th>
+                        <th>Sơ đồ ghế</th>
+                        <th class="text-end">Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="st : ${showtimes}">
+                        <td th:text="${st.id}">1</td>
+                        <td><span class="badge bg-dark-subtle text-dark" th:text="${st.roomName}">Hall 1</span></td>
+                        <td class="fw-semibold text-primary" th:text="${#temporals.format(st.startTime, 'dd/MM/yyyy HH:mm')}">Time</td>
+                        <td class="fw-bold text-success" th:text="${#numbers.formatDecimal(st.basePrice, 0, 'POINT', 0, 'POINT')} + ' đ'">Price</td>
+                        <td>
+                            <a th:href="@{/showtimes/{id}/seats(id=${st.id})}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-grid-3x3-gap me-1"></i> Xem 30 Ghế
+                            </a>
+                        </td>
+                        <td class="text-end">
+                            <a th:href="@{/showtimes/edit/{id}(id=${st.id})}" class="btn btn-sm btn-light text-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form th:action="@{/showtimes/delete/{id}(id=${st.id})}" method="post"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa suất chiếu này?');" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-light text-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(showtimes)}">
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            Phim này chưa có suất chiếu nào được tạo.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{layout/main :: footer}"></footer>
+<div th:replace="~{layout/main :: scripts}"></div>
+</body>
+</html>
