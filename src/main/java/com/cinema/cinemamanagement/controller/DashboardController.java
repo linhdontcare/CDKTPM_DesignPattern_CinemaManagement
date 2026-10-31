@@ -11,17 +11,23 @@ public class DashboardController {
 
     private final MovieService movieService;
     private final ShowtimeService showtimeService;
+    private final com.cinema.cinemamanagement.service.BookingService bookingService;
 
-    public DashboardController(MovieService movieService, ShowtimeService showtimeService) {
+    public DashboardController(MovieService movieService,
+                               ShowtimeService showtimeService,
+                               com.cinema.cinemamanagement.service.BookingService bookingService) {
         this.movieService = movieService;
         this.showtimeService = showtimeService;
+        this.bookingService = bookingService;
     }
 
     @GetMapping({"/", "/dashboard"})
     public String dashboard(Model model) {
         model.addAttribute("movieCount", movieService.countMovies());
         model.addAttribute("showtimeCount", showtimeService.countShowtimes());
+        model.addAttribute("bookingCount", bookingService.countBookings());
         model.addAttribute("recentShowtimes", showtimeService.getAllShowtimes());
+        model.addAttribute("recentBookings", bookingService.getAllBookings());
         model.addAttribute("movies", movieService.getAllMovies());
         return "dashboard";
     }

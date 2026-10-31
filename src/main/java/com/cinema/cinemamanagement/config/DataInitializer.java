@@ -19,10 +19,14 @@ public class DataInitializer implements CommandLineRunner {
 
     private final MovieRepository movieRepository;
     private final ShowtimeService showtimeService;
+    private final com.cinema.cinemamanagement.service.BookingService bookingService;
 
-    public DataInitializer(MovieRepository movieRepository, ShowtimeService showtimeService) {
+    public DataInitializer(MovieRepository movieRepository,
+                           ShowtimeService showtimeService,
+                           com.cinema.cinemamanagement.service.BookingService bookingService) {
         this.movieRepository = movieRepository;
         this.showtimeService = showtimeService;
+        this.bookingService = bookingService;
     }
 
     @Override
@@ -80,8 +84,39 @@ public class DataInitializer implements CommandLineRunner {
 
         // Spider-Man showtimes
         ShowtimeDto st5 = new ShowtimeDto(null, spiderMan.getId(), now.plusHours(6), 75000.0, "Phòng Chiếu 03 (Standard)");
-        showtimeService.createShowtime(st5);
+        com.cinema.cinemamanagement.entity.Showtime savedSt5 = showtimeService.createShowtime(st5);
 
-        logger.info("Sample data initialized successfully! Movies: {}, Showtimes: 5 with seats A1-A10, B1-B10, C1-C10 generated.", movieRepository.count());
+        // 3. Create Sample Bookings (Demonstrating State, Strategy, and Observer Patterns)
+        try {
+            // Đơn 1: Đã xác nhận CONFIRMED (Avengers - Ghế A1, A2) -> Thanh toán MoMo qua Strategy & Adapter -> Phát Event Observer
+            com.cinema.cinemamanagement.entity.Showtime showtime1 = showtimeService.getAllShowtimes().get(0);
+            var seatsSt1 = showtimeService.getSeatsForShowtime(showtime1.getId());
+            var sampleBooking1 = bookingService.createBooking(
+                    showtime1.getId(),
+                    java.util.List.of(seatsSt1.get(0).getId(), seatsSt1.get(1).getId()),
+                    "Trần Tuấn Anh",
+                    "tuananh@cinema.vn",
+                    "0912345678"
+            );
+            // Thanh toán qua MoMo (Strategy + Adapter)
+            bookingService.payBooking(sampleBooking1.getId(), "MOMO");
+            // Xác nhận (State -> CONFIRMED, kích hoạt Observer: Email, SMS, Point)
+            bookingService.confirmBooking(sampleBooking1.getId());
+
+            // Đơn 2: Đang ở PENDING (Interstellar - Ghế B1, B2)
+            com.cinema.cinemamanagement.entity.Showtime showtime3 = showtimeService.getAllShowtimes().get(2);
+            var seatsSt3 = showtimeService.getSeatsForShowtime(showtime3.getId());
+            bookingService.createBooking(
+                    showtime3.getId(),
+                    java.util.List.of(seatsSt3.get(10).getId(), seatsSt3.get(11).getId()),
+                    "Lê Thu Trang",
+                    "thutrang@gmail.com",
+                    "0987654321"
+            );
+        } catch (Exception e) {
+            logger.warn("Không thể tạo booking mẫu: {}", e.getMessage());
+        }
+
+        logger.info("Sample data initialized successfully! Movies: {}, Showtimes: 5, Sample Bookings with Patterns created.", movieRepository.count());
     }
 }

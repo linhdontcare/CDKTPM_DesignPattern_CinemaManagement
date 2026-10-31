@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/main :: head('Chi tiết Đơn Đặt Vé')}"></head>
+<body>
+<nav th:replace="~{layout/main :: navbar}"></nav>
+<div th:replace="~{layout/main :: alerts}"></div>
+
+<div class="container my-4" style="max-width: 900px;">
+    <!-- Breadcrumb & Title -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <a th:href="@{/bookings}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h2 class="fw-bold mb-0">Đơn Đặt Vé: <span class="text-primary" th:text="${booking.bookingCode}">BK-1234</span></h2>
+            </div>
+            <p class="text-muted mt-1 mb-0">Theo dõi trạng thái State Pattern và kích hoạt Observer Pattern</p>
+        </div>
+        <div>
+            <!-- Status Badge -->
+            <span th:if="${booking.status.name() == 'PENDING'}" class="badge bg-secondary px-3 py-2 fs-6">Trạng thái: PENDING</span>
+            <span th:if="${booking.status.name() == 'AWAITING_PAYMENT'}" class="badge bg-warning text-dark px-3 py-2 fs-6">Trạng thái: AWAITING_PAYMENT</span>
+            <span th:if="${booking.status.name() == 'PAID'}" class="badge bg-primary px-3 py-2 fs-6">Trạng thái: PAID</span>
+            <span th:if="${booking.status.name() == 'CONFIRMED'}" class="badge bg-success px-3 py-2 fs-6"><i class="bi bi-check-circle me-1"></i>Trạng thái: CONFIRMED</span>
+            <span th:if="${booking.status.name() == 'CANCELLED'}" class="badge bg-danger px-3 py-2 fs-6">Trạng thái: CANCELLED</span>
+            <span th:if="${booking.status.name() == 'REFUNDED'}" class="badge bg-dark px-3 py-2 fs-6">Trạng thái: REFUNDED</span>
+            <span th:if="${booking.status.name() == 'EXPIRED'}" class="badge bg-secondary-subtle text-muted px-3 py-2 fs-6">Trạng thái: EXPIRED</span>
+        </div>
+    </div>
+
+    <!-- State Lifecycle Progression Bar -->
+    <div class="card shadow-sm border-0 rounded-3 p-3 mb-4 bg-light">
+        <div class="row text-center small fw-semibold g-2">
+            <div class="col-3">
+                <div class="p-2 rounded border"
+                     th:classappend="${booking.status.name() == 'PENDING'} ? 'bg-secondary text-white' : 'bg-white text-muted'">
+                    1. PENDING (Tạo đơn)
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="p-2 rounded border"
+                     th:classappend="${booking.status.name() == 'AWAITING_PAYMENT'} ? 'bg-warning text-dark' : 'bg-white text-muted'">
+                    2. AWAITING PAYMENT
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="p-2 rounded border"
+                     th:classappend="${booking.status.name() == 'PAID'} ? 'bg-primary text-white' : 'bg-white text-muted'">
+                    3. PAID (Thanh toán)
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="p-2 rounded border"
+                     th:classappend="${booking.status.name() == 'CONFIRMED'} ? 'bg-success text-white' : 'bg-white text-muted'">
+                    4. CONFIRMED (Xác nhận)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Ticket Information -->
+        <div class="col-12 col-md-7">
+            <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-info-circle text-danger me-2"></i>Chi Tiết Vé & Suất Chiếu</h5>
+
+                <div class="row g-3 small">
+                    <div class="col-6">
+                        <div class="text-muted">Phim:</div>
+                        <strong class="fs-6 text-dark" th:text="${booking.showtime.movie.title}">Avengers</strong>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted">Phòng chiếu:</div>
+                        <strong class="fs-6 text-dark" th:text="${booking.showtime.roomName}">Hall 1</strong>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted">Thời gian chiếu:</div>
+                        <div class="fw-semibold text-primary" th:text="${#temporals.format(booking.showtime.startTime, 'dd/MM/yyyy HH:mm')}">Time</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted">Danh sách ghế:</div>
+                        <div>
+                            <span th:each="s : ${booking.seats}" class="badge bg-dark me-1" th:text="${s.seatNumber}">A1</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted">Khách hàng:</div>
+                        <div class="fw-bold text-dark" th:text="${booking.customerName}">Nguyễn Văn A</div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-muted">Email & SĐT:</div>
+                        <div><span th:text="${booking.customerEmail}">email</span> &bull; <span th:text="${booking.customerPhone}">phone</span></div>
+                    </div>
+                </div>
+
+                <hr class="my-3 text-muted">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fs-6 text-muted">Tổng tiền vé:</span>
+                    <strong class="text-danger fs-4" th:text="${#numbers.formatDecimal(booking.totalAmount, 0, 'POINT', 0, 'POINT')} + ' đ'">170.000 đ</strong>
+                </div>
+
+                <div th:if="${booking.paymentMethod != null}" class="mt-2 text-muted small">
+                    Phương thức đã thanh toán: <span class="badge bg-info text-dark" th:text="${booking.paymentMethod}">MOMO</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pattern Actions Panel -->
+        <div class="col-12 col-md-5">
+            <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
+                <h5 class="fw-bold mb-3"><i class="bi bi-gear text-primary me-2"></i>Hành Động Nghiệp Vụ</h5>
+
+                <!-- Action 1: Payment (Allowed when PENDING or AWAITING_PAYMENT) -->
+                <div th:if="${booking.status.name() == 'PENDING' || booking.status.name() == 'AWAITING_PAYMENT'}">
+                    <form th:action="@{/bookings/{id}/pay(id=${booking.id})}" method="post">
+                        <label class="form-label small fw-bold">Chọn Phương thức Thanh toán (Strategy):</label>
+                        <select name="paymentMethod" class="form-select mb-3">
+                            <option th:each="m : ${supportedMethods}" th:value="${m}"
+                                    th:text="${m} + (${m == 'CASH'} ? ' (Tiền mặt tại quầy)' : (${m == 'MOMO'} ? ' (Ví MoMo - Adapter)' : ' (Cổng VNPay - Adapter)'))">
+                            </option>
+                        </select>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold mb-2">
+                            <i class="bi bi-credit-card me-1"></i> Thực hiện Thanh toán (PAID)
+                        </button>
+                    </form>
+
+                    <form th:action="@{/bookings/{id}/cancel(id=${booking.id})}" method="post"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn đặt vé này không?');">
+                        <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                            <i class="bi bi-x-circle me-1"></i> Hủy Đặt Vé (CANCELLED)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Action 2: Confirm Ticket (Allowed when PAID) -->
+                <div th:if="${booking.status.name() == 'PAID'}">
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="bi bi-info-circle me-1"></i> Đơn đã thanh toán thành công! Hãy xác nhận để kích hoạt Observer Pattern.
+                    </div>
+
+                    <form th:action="@{/bookings/{id}/confirm(id=${booking.id})}" method="post">
+                        <button type="submit" class="btn btn-success w-100 py-2 fw-semibold mb-2">
+                            <i class="bi bi-check2-circle me-1"></i> Xác Nhận Vé & Phát Event (CONFIRMED)
+                        </button>
+                    </form>
+
+                    <form th:action="@{/bookings/{id}/refund(id=${booking.id})}" method="post"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn hoàn tiền cho vé này không?');">
+                        <button type="submit" class="btn btn-outline-secondary w-100 btn-sm">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Hoàn Tiền Vé (REFUNDED)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Action 3: Already CONFIRMED -->
+                <div th:if="${booking.status.name() == 'CONFIRMED'}">
+                    <div class="alert alert-success py-2 small mb-3">
+                        <i class="bi bi-check-circle-fill me-1"></i> Vé đã được xác nhận thành công!
+                        Ghế đã chuyển sang <strong>BOOKED</strong>.
+                        Sự kiện <code>BookingConfirmedEvent</code> đã được các Observer tiếp nhận.
+                    </div>
+
+                    <a th:href="@{/payments}" class="btn btn-outline-info w-100 py-2 btn-sm mb-2">
+                        <i class="bi bi-bell-fill me-1"></i> Xem Nhật ký Observer (Email / SMS / Điểm)
+                    </a>
+
+                    <form th:action="@{/bookings/{id}/refund(id=${booking.id})}" method="post"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn hoàn tiền vé này không? Ghế sẽ được trả về trạng thái AVAILABLE.');">
+                        <button type="submit" class="btn btn-outline-warning text-dark w-100 btn-sm">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Yêu Cầu Hoàn Tiền (REFUNDED)
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Action 4: CANCELLED or REFUNDED -->
+                <div th:if="${booking.status.name() == 'CANCELLED' || booking.status.name() == 'REFUNDED' || booking.status.name() == 'EXPIRED'}">
+                    <div class="alert alert-secondary py-2 small mb-0">
+                        Đơn hàng đã kết thúc vòng đời (<span th:text="${booking.status}"></span>). Các hành động thanh toán hoặc xác nhận đều bị State Pattern chặn lại.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{layout/main :: footer}"></footer>
+<div th:replace="~{layout/main :: scripts}"></div>
+</body>
+</html>
+

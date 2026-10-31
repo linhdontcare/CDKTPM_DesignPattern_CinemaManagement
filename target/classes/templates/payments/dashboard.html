@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/main :: head('Quản lý Thanh toán & Giám sát Observer')}"></head>
+<body>
+<nav th:replace="~{layout/main :: navbar}"></nav>
+<div th:replace="~{layout/main :: alerts}"></div>
+
+<div class="container my-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-credit-card text-success me-2"></i>Trung Tâm Thanh Toán & Giám Sát Observer</h2>
+            <p class="text-muted mb-0">Thực nghiệm Strategy Pattern, Adapter Pattern và theo dõi sự kiện từ Observer Pattern</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/bookings/new}" class="btn btn-danger btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Tạo Đặt Vé Mới
+            </a>
+            <a th:href="@{/bookings}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-ticket-perforated me-1"></i> Xem danh sách vé
+            </a>
+        </div>
+    </div>
+
+    <!-- Strategy & Adapter Status Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Supported Strategies -->
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-diagram-3 text-primary me-2"></i>Chiến Lược Thanh Toán (Strategy Pattern)</h5>
+                    <span class="badge bg-primary">OCP Compliant</span>
+                </div>
+                <p class="text-muted small">
+                    <code>PaymentService</code> nạp tự động toàn bộ <code>PaymentStrategy</code> hiện có trong Spring Context mà <strong>không sử dụng if-else/switch</strong>:
+                </p>
+
+                <div class="list-group list-group-flush small">
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                        <div>
+                            <strong>CASH (Tiền mặt tại quầy)</strong>
+                            <div class="text-muted small"><code>CashPaymentStrategy</code> - xử lý trực tiếp, xuất biên lai tại rạp</div>
+                        </div>
+                        <span class="badge bg-success">Active</span>
+                    </div>
+
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                        <div>
+                            <strong>MOMO (Ví MoMo)</strong>
+                            <div class="text-muted small"><code>MomoPaymentStrategy</code> &rarr; gọi <code>MomoPaymentAdapter</code> &rarr; <code>MomoExternalApi</code></div>
+                        </div>
+                        <span class="badge bg-success">Active (Adapter)</span>
+                    </div>
+
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                        <div>
+                            <strong>VNPAY (Cổng VNPay)</strong>
+                            <div class="text-muted small"><code>VNPayPaymentStrategy</code> &rarr; gọi <code>VNPayPaymentAdapter</code> &rarr; <code>VNPayExternalApi</code></div>
+                        </div>
+                        <span class="badge bg-success">Active (Adapter)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observer Summary -->
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm border-0 rounded-3 p-4 bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-bell-fill text-warning me-2"></i>Bộ Ba Observer (Observer Pattern)</h5>
+                    <span class="badge bg-warning text-dark">Event Driven</span>
+                </div>
+                <p class="text-muted small">
+                    Khi một vé được chuyển sang <code>CONFIRMED</code>, hệ thống phát ra <code>BookingConfirmedEvent</code> và 3 Observer phản ứng độc lập:
+                </p>
+
+                <div class="row g-2 text-center pt-2">
+                    <div class="col-4">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <i class="bi bi-envelope-check text-primary fs-3"></i>
+                            <div class="fw-bold mt-1" th:text="${#lists.size(emailLogs)}">0</div>
+                            <div class="text-muted small" style="font-size: 0.75rem;">Emails Đã Gửi</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <i class="bi bi-chat-dots text-info fs-3"></i>
+                            <div class="fw-bold mt-1" th:text="${#lists.size(smsLogs)}">0</div>
+                            <div class="text-muted small" style="font-size: 0.75rem;">SMS Đã Gửi</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <i class="bi bi-gem text-warning fs-3"></i>
+                            <div class="fw-bold mt-1" th:text="${totalPoints}">0</div>
+                            <div class="text-muted small" style="font-size: 0.75rem;">Điểm Tích Lũy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Observer Activity Logs Tabs -->
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <ul class="nav nav-tabs card-header-tabs" id="observerTab" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active fw-semibold" id="email-tab" data-bs-toggle="tab" data-bs-target="#emailPane" type="button">
+                        <i class="bi bi-envelope me-1 text-primary"></i> Email Observer Logs (<span th:text="${#lists.size(emailLogs)}">0</span>)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-semibold" id="sms-tab" data-bs-toggle="tab" data-bs-target="#smsPane" type="button">
+                        <i class="bi bi-chat-text me-1 text-info"></i> SMS Observer Logs (<span th:text="${#lists.size(smsLogs)}">0</span>)
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-semibold" id="point-tab" data-bs-toggle="tab" data-bs-target="#pointPane" type="button">
+                        <i class="bi bi-star me-1 text-warning"></i> Member Point Logs (<span th:text="${#lists.size(pointLogs)}">0</span>)
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body p-4">
+            <div class="tab-content" id="observerTabContent">
+                <!-- Email Logs -->
+                <div class="tab-pane fade show active" id="emailPane" role="tabpanel">
+                    <div th:if="${not #lists.isEmpty(emailLogs)}">
+                        <div th:each="log : ${emailLogs}" class="alert alert-light border py-2 mb-2 font-monospace small">
+                            <i class="bi bi-envelope-fill text-primary me-2"></i><span th:text="${log}">Log entry</span>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(emailLogs)}" class="text-center py-4 text-muted">
+                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                        Chưa có email nào được gửi. Hãy tạo một đơn đặt vé và nhấn "Xác Nhận Vé" để kích hoạt Observer.
+                    </div>
+                </div>
+
+                <!-- SMS Logs -->
+                <div class="tab-pane fade" id="smsPane" role="tabpanel">
+                    <div th:if="${not #lists.isEmpty(smsLogs)}">
+                        <div th:each="log : ${smsLogs}" class="alert alert-light border py-2 mb-2 font-monospace small">
+                            <i class="bi bi-chat-dots-fill text-info me-2"></i><span th:text="${log}">Log entry</span>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(smsLogs)}" class="text-center py-4 text-muted">
+                        <i class="bi bi-chat-square-dots fs-2 d-block mb-2"></i>
+                        Chưa có tin nhắn SMS nào được gửi.
+                    </div>
+                </div>
+
+                <!-- Point Logs -->
+                <div class="tab-pane fade" id="pointPane" role="tabpanel">
+                    <div th:if="${not #lists.isEmpty(pointLogs)}">
+                        <div th:each="log : ${pointLogs}" class="alert alert-light border py-2 mb-2 font-monospace small">
+                            <i class="bi bi-gem text-warning me-2"></i><span th:text="${log}">Log entry</span>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(pointLogs)}" class="text-center py-4 text-muted">
+                        <i class="bi bi-award fs-2 d-block mb-2"></i>
+                        Chưa có điểm thưởng thành viên nào được cộng.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{layout/main :: footer}"></footer>
+<div th:replace="~{layout/main :: scripts}"></div>
+</body>
+</html>
+

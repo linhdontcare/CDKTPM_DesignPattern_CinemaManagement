@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/main :: head('Chọn Ghế & Đặt Vé')}"></head>
+<body>
+<nav th:replace="~{layout/main :: navbar}"></nav>
+<div th:replace="~{layout/main :: alerts}"></div>
+
+<div class="container my-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-grid-3x3-gap text-danger me-2"></i>Chọn Ghế & Khởi Tạo Đặt Vé</h2>
+            <p class="text-muted mb-0">Bước 1: Chọn ghế ngồi &bull; Bước 2: Thanh toán (Strategy) &bull; Bước 3: Xác nhận vé (Observer)</p>
+        </div>
+        <a th:href="@{/bookings}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại
+        </a>
+    </div>
+
+    <!-- Showtime Selector and Information Card -->
+    <div class="card shadow-sm border-0 rounded-3 mb-4">
+        <div class="card-body p-3">
+            <form th:action="@{/bookings/new}" method="get" class="row g-3 align-items-center">
+                <div class="col-md-7">
+                    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Đang chọn Suất Chiếu:</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <select name="showtimeId" class="form-select" onchange="this.form.submit()">
+                            <option th:each="st : ${allShowtimes}"
+                                    th:value="${st.id}"
+                                    th:selected="${st.id == showtime.id}"
+                                    th:text="${st.movie.title} + ' - ' + ${st.roomName} + ' (' + ${#temporals.format(st.startTime, 'dd/MM/yyyy HH:mm')} + ') - ' + ${#numbers.formatDecimal(st.basePrice, 0, 'POINT', 0, 'POINT')} + ' đ'">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="p-2 bg-light rounded text-center small">
+                        Giá vé cơ bản: <strong class="text-success fs-6" id="basePriceDisplay" th:text="${#numbers.formatDecimal(showtime.basePrice, 0, 'POINT', 0, 'POINT')} + ' đ'">85.000 đ</strong>
+                        <input type="hidden" id="basePrice" th:value="${showtime.basePrice}">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Form for Booking -->
+    <form th:action="@{/bookings/new}" method="post" id="bookingForm">
+        <input type="hidden" name="showtimeId" th:value="${showtime.id}">
+
+        <div class="row g-4">
+            <!-- Left: Cinema Hall Seat Selector -->
+            <div class="col-12 col-lg-8">
+                <div class="card shadow-sm border-0 rounded-3 p-4 bg-white text-center">
+                    <div class="screen-indicator">
+                        <span class="screen-text">Màn Hình Chiếu / Screen</span>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="d-flex justify-content-center gap-3 mb-4 small fw-semibold">
+                        <div class="d-flex align-items-center gap-1">
+                            <div class="seat-box seat-available" style="width: 20px; height: 20px;"></div>
+                            <span>Trống</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <div class="seat-box bg-primary text-white" style="width: 20px; height: 20px;"></div>
+                            <span>Đang chọn</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <div class="seat-box seat-held" style="width: 20px; height: 20px;"></div>
+                            <span>Đang giữ chỗ</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <div class="seat-box seat-booked" style="width: 20px; height: 20px;"></div>
+                            <span>Đã bán</span>
+                        </div>
+                    </div>
+
+                    <!-- Seat Matrix -->
+                    <div class="seat-grid">
+                        <!-- Row A -->
+                        <div class="seat-row">
+                            <div class="seat-row-label">A</div>
+                            <th:block th:each="s : ${seats}" th:if="${s.seatRow == 'A'}">
+                                <label class="seat-select-wrapper" style="cursor: pointer;">
+                                    <input type="checkbox" name="seatIds" th:value="${s.id}" class="d-none seat-checkbox"
+                                           th:disabled="${s.status.name() != 'AVAILABLE'}">
+                                    <div class="seat-box"
+                                         th:classappend="${s.status.name() == 'AVAILABLE'} ? 'seat-available' : (${s.status.name() == 'HELD'} ? 'seat-held' : 'seat-booked')"
+                                         th:title="'Ghế ' + ${s.seatNumber} + ' - ' + ${s.status}">
+                                        <span th:text="${s.seatNumber}">A1</span>
+                                    </div>
+                                </label>
+                            </th:block>
+                        </div>
+
+                        <!-- Row B -->
+                        <div class="seat-row">
+                            <div class="seat-row-label">B</div>
+                            <th:block th:each="s : ${seats}" th:if="${s.seatRow == 'B'}">
+                                <label class="seat-select-wrapper" style="cursor: pointer;">
+                                    <input type="checkbox" name="seatIds" th:value="${s.id}" class="d-none seat-checkbox"
+                                           th:disabled="${s.status.name() != 'AVAILABLE'}">
+                                    <div class="seat-box"
+                                         th:classappend="${s.status.name() == 'AVAILABLE'} ? 'seat-available' : (${s.status.name() == 'HELD'} ? 'seat-held' : 'seat-booked')"
+                                         th:title="'Ghế ' + ${s.seatNumber} + ' - ' + ${s.status}">
+                                        <span th:text="${s.seatNumber}">B1</span>
+                                    </div>
+                                </label>
+                            </th:block>
+                        </div>
+
+                        <!-- Row C -->
+                        <div class="seat-row">
+                            <div class="seat-row-label">C</div>
+                            <th:block th:each="s : ${seats}" th:if="${s.seatRow == 'C'}">
+                                <label class="seat-select-wrapper" style="cursor: pointer;">
+                                    <input type="checkbox" name="seatIds" th:value="${s.id}" class="d-none seat-checkbox"
+                                           th:disabled="${s.status.name() != 'AVAILABLE'}">
+                                    <div class="seat-box"
+                                         th:classappend="${s.status.name() == 'AVAILABLE'} ? 'seat-available' : (${s.status.name() == 'HELD'} ? 'seat-held' : 'seat-booked')"
+                                         th:title="'Ghế ' + ${s.seatNumber} + ' - ' + ${s.status}">
+                                        <span th:text="${s.seatNumber}">C1</span>
+                                    </div>
+                                </label>
+                            </th:block>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Customer Info & Order Summary -->
+            <div class="col-12 col-lg-4">
+                <div class="card shadow-sm border-0 rounded-3 p-4 bg-white">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-person-lines-fill text-danger me-2"></i>Thông Tin Đặt Vé</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Họ và Tên <span class="text-danger">*</span></label>
+                        <input type="text" name="customerName" class="form-control" required value="Nguyễn Hoàng Nam">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Email nhận vé điện tử <span class="text-danger">*</span></label>
+                        <input type="email" name="customerEmail" class="form-control" required value="hoangnam@gmail.com">
+                        <div class="form-text small">Observer sẽ gửi vé qua email này khi xác nhận.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Số điện thoại nhận SMS <span class="text-danger">*</span></label>
+                        <input type="tel" name="customerPhone" class="form-control" required value="0988776655">
+                        <div class="form-text small">Observer sẽ gửi tin nhắn SMS tới số này.</div>
+                    </div>
+
+                    <hr class="my-3 text-muted">
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted small">Số ghế đã chọn:</span>
+                        <strong class="fs-6" id="selectedCount">0 ghế</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted small">Tổng tiền thanh toán:</span>
+                        <strong class="text-danger fs-5" id="totalPrice">0 đ</strong>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold" id="btnSubmit" disabled>
+                        <i class="bi bi-ticket-perforated-fill me-1"></i> Khởi Tạo Đặt Vé (PENDING)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="~{layout/main :: footer}"></footer>
+<div th:replace="~{layout/main :: scripts}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('.seat-checkbox');
+        const selectedCount = document.getElementById('selectedCount');
+        const totalPrice = document.getElementById('totalPrice');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const basePrice = parseFloat(document.getElementById('basePrice').value) || 0;
+
+        function updateSummary() {
+            let count = 0;
+            checkboxes.forEach(cb => {
+                const box = cb.nextElementSibling;
+                if (cb.checked) {
+                    count++;
+                    box.classList.remove('seat-available');
+                    box.classList.add('bg-primary', 'text-white');
+                } else if (!cb.disabled) {
+                    box.classList.remove('bg-primary', 'text-white');
+                    box.classList.add('seat-available');
+                }
+            });
+
+            selectedCount.textContent = count + ' ghế';
+            const total = count * basePrice;
+            totalPrice.textContent = total.toLocaleString('vi-VN') + ' đ';
+
+            btnSubmit.disabled = (count === 0);
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateSummary);
+        });
+    });
+</script>
+</body>
+</html>
+

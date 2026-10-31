@@ -1,2 +1,7 @@
+com\cinema\cinemamanagement\pattern\ObserverPatternTest.class
 com\cinema\cinemamanagement\CinemaManagementApplicationTests.class
 com\cinema\cinemamanagement\Phase1ServicesTest.class
+com\cinema\cinemamanagement\pattern\StrategyPatternTest.class
+com\cinema\cinemamanagement\pattern\StatePatternTest.class
+com\cinema\cinemamanagement\pattern\AdapterPatternTest.class
+com\cinema\cinemamanagement\pattern\StrategyPatternTest$1.class

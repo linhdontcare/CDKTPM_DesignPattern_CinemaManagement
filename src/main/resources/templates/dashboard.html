@@ -14,14 +14,17 @@
                 Đề tài: <em>“Nghiên cứu, ứng dụng và đánh giá Design Patterns trong hệ thống quản lý rạp chiếu phim”</em>.
             </p>
             <div class="d-flex flex-wrap gap-2 pt-2">
+                <a th:href="@{/bookings/new}" class="btn btn-warning btn-sm px-3 fw-semibold">
+                    <i class="bi bi-ticket-perforated-fill me-1"></i> Đặt Vé Ngay (Demo Luồng)
+                </a>
                 <a th:href="@{/movies}" class="btn btn-danger btn-sm px-3">
                     <i class="bi bi-camera-reels me-1"></i> Quản lý Phim
                 </a>
                 <a th:href="@{/showtimes}" class="btn btn-outline-light btn-sm px-3">
                     <i class="bi bi-clock-history me-1"></i> Quản lý Suất chiếu
                 </a>
-                <a th:href="@{/movies/new}" class="btn btn-warning btn-sm px-3">
-                    <i class="bi bi-plus-circle me-1"></i> Thêm phim mới
+                <a th:href="@{/payments}" class="btn btn-outline-info btn-sm px-3">
+                    <i class="bi bi-credit-card me-1"></i> Giám sát Patterns & Observers
                 </a>
             </div>
         </div>
@@ -29,7 +32,7 @@
 
     <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
-        <div class="col-12 col-md-4">
+        <div class="col-6 col-lg-3">
             <div class="card card-stat p-3 bg-white border-start border-danger border-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
@@ -46,11 +49,11 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-4">
+        <div class="col-6 col-lg-3">
             <div class="card card-stat p-3 bg-white border-start border-primary border-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="text-muted small text-uppercase fw-bold">Suất chiếu hiện có</div>
+                        <div class="text-muted small text-uppercase fw-bold">Suất chiếu</div>
                         <div class="fs-2 fw-bold text-dark" th:text="${showtimeCount}">0</div>
                     </div>
                     <div class="fs-1 text-primary opacity-75">
@@ -63,11 +66,28 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-4">
+        <div class="col-6 col-lg-3">
+            <div class="card card-stat p-3 bg-white border-start border-warning border-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small text-uppercase fw-bold">Đơn Đặt Vé</div>
+                        <div class="fs-2 fw-bold text-dark" th:text="${bookingCount}">0</div>
+                    </div>
+                    <div class="fs-1 text-warning opacity-75">
+                        <i class="bi bi-ticket-perforated"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <a th:href="@{/bookings}" class="text-decoration-none small text-warning fw-semibold">Quản lý vé &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
             <div class="card card-stat p-3 bg-white border-start border-success border-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="text-muted small text-uppercase fw-bold">Sơ đồ Ghế / Suất</div>
+                        <div class="text-muted small text-uppercase fw-bold">Sơ đồ Ghế</div>
                         <div class="fs-2 fw-bold text-dark">30 Ghế</div>
                     </div>
                     <div class="fs-1 text-success opacity-75">
